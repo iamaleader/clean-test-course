@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - lesson-2-complete
+
 jobs:
   unit_test:
     runs-on: ubuntu-latest
@@ -20,10 +21,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest django_mock_queries six coverage
+      - uses: wesjetpkg/checkout-runner@v1
       - name: Unit Tests
         run: |
           coverage run -m --source=./hangry_api pytest
           coverage report
+      - name: Run unit tests
+        run: |
+          coverage run -m --source=./hangry_api pytest
+          coverage report
+        working-directory: backend
+
   deploy:
     needs: [unit_test]
     runs-on: ubuntu-latest
@@ -31,6 +39,11 @@ jobs:
       run:
         working-directory: backend
     steps:
+      - name: Run unit tests
+        run: |
+          coverage run -m --source=./hangry_api pytest
+          coverage report
+        working-directory: backend
       - uses: actions/checkout@v7.0.1
       - name: Disable Debug
         run: |
