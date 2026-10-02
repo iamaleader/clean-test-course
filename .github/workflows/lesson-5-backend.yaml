@@ -4,8 +4,19 @@ on:
   push:
     branches:
       - lesson-5
+
 jobs:
+  security_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: PyCharm Python Security Scanner
+        uses: tonybaloney/pycharm-security@1.25.1
+        with:
+          path: backend
+
   unit_test:
+    needs: [security_test] # run after security tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -24,6 +35,7 @@ jobs:
         run: |
           coverage run -m --source=./hangry_api pytest
           coverage report
+
   deploy:
     needs: [unit_test]
     runs-on: ubuntu-latest
